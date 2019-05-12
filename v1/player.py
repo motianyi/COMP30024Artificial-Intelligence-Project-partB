@@ -44,7 +44,7 @@ def getAdjacentHexes(pos):
         (pos[0] - 1, pos[1] + 1)]
     return [adjacentHex for adjacentHex in adjacentHexes if isOnBoard(adjacentHex)]
 
-def nextPlayer(playerColor, hexes):
+def nextPlayer(playerColor):
     if playerColor == 'red':
         return 'green'
     elif playerColor == 'green':
@@ -164,6 +164,37 @@ def exit_dist(qr, colour):
     if colour == 'blue':
         return 3 - (-q-r)
 
+# def heuristic(hexes, numExits):
+#     result = {'red':0, 'green':0, 'blue': 0}
+#     w1 = 10
+#     w2 = 200
+#     w3 = 100
+#     w4 = 0
+#     for colour in result.keys():
+#         value1 = f1(hexes, numExits, colour)
+#         value2 = f2(hexes, numExits, colour)
+#         value3 = f3(hexes, numExits, colour)
+#         value4 = f4(hexes, numExits, colour)
+#         result[colour] = w1*value1 + w2*value2 + w3*value3 +w4*value4
+#     return result
+
+# def f1(hexes, numExits, colour):
+#     pieces = hexes[colour]
+#     return -sum(exit_dist(qr, colour)for qr in pieces)
+
+# def f2(hexes, numExits, colour):
+#     #number of pieces
+    
+#     return -len(hexes['red'])-len(hexes['green'])-len(hexes['blue'])+3*len(hexes[colour])
+    
+
+# def f3(hexes, numExits, colour):
+
+#     return -numExits['red']-numExits['green']-numExits['blue']+3*numExits[colour]
+
+# def f4(hexes, numExits, colour):
+#     return 0
+
 def heuristic(hexes, numExits):
     result = {'red':0, 'green':0, 'blue': 0}
     # result['red'] = -sum(math.ceil(exit_dist(qr,'red') / 2) + 1 for qr in hexes['red'])
@@ -176,16 +207,23 @@ def heuristic(hexes, numExits):
         # print(-sum(exit_dist(qr,colour) for qr in hexes[colour]))
         result[colour]+= len(hexes[colour])*200+ numExits[colour]*500
 
-        panalty = 100
+        panalty = 1000
+        panalty2 = 20
         if(colour == 'red'):
             result[colour] -= numExits['blue']*panalty
             result[colour] -= numExits['green']*panalty
+            result[colour] -= len(hexes['blue'])*panalty2
+            result[colour] -= len(hexes['green'])*panalty2
         elif(colour == 'green'):
             result[colour] -= numExits['blue']*panalty
             result[colour] -= numExits['red']*panalty
+            result[colour] -= len(hexes['blue'])*panalty2
+            result[colour] -= len(hexes['red'])*panalty2
         elif(colour == 'blue'):
             result[colour] -= numExits['red']*panalty
             result[colour] -= numExits['green']*panalty
+            result[colour] -= len(hexes['red'])*panalty2
+            result[colour] -= len(hexes['green'])*panalty2
 
 
     # # # print(sum(math.ceil(exit_dist(qr) / 2) + 1 for qr in pieces))
@@ -193,7 +231,6 @@ def heuristic(hexes, numExits):
     # print(result)
     # return sum(math.ceil(self.exit_dist(qr) / 2) + 1 for qr in pieces)
     return result
-
 
 class ExamplePlayer:
     def __init__(self, colour):
@@ -244,7 +281,7 @@ class ExamplePlayer:
         #     elif h == curr_h:
         #         bestMove.append(move)
         # return random.choice(bestMove)
-        depth = 2
+        depth = 3
         return self.maxN(self.hexes.copy(),self.exitedPieces.copy(), depth, self.colour)[1]
 
 
@@ -280,18 +317,30 @@ class ExamplePlayer:
         # inintial value dictionary
         vMax = {'red':-100000, 'green':-100000, 'blue': -100000}
         bestActionList = []
+        bestAction = ('PASS', None)
         succ = getSuccessors(hexes.copy(), numExits.copy(), colour)
+        
         if(len(succ) == 0):
-            (valuesVector, action) = self.maxN(hexes.copy(), numExits.copy(), depth-1, nextPlayer(colour,hexes))
+            (valuesVector, action) = self.maxN(hexes.copy(), numExits.copy(), depth-1, nextPlayer(colour))
             return (valuesVector, ('PASS', None))
         for (succHexes, succNumExits, move) in succ:
-            (valuesVector, action) = self.maxN(succHexes.copy(), succNumExits.copy(), depth-1, nextPlayer(colour,hexes))
-            
-            if valuesVector[colour] >= vMax[colour]:
-                
+            # print(move)
+            (valuesVector, action) = self.maxN(succHexes.copy(), succNumExits.copy(), depth-1, nextPlayer(colour))
+            # print(valuesVector[colour])
+            if valuesVector[colour] > vMax[colour]:
                 vMax = valuesVector
+                bestAction = move
+                bestActionList = []
+                bestActionList.append(move)
+            elif valuesVector[colour] == vMax[colour]:
+               
+                bestAction = move
                 bestActionList.append(move)
         #add randomness
+        # print(bestAction)
+
+        # print("\n")
+        # print(bestActionList)
         return (vMax, random.choice(bestActionList))
 
             
