@@ -185,6 +185,7 @@ class ExamplePlayer:
             updateHelper(self.pieces, self.blocks, action)
         else:
             updateHelper(self.blocks, self.pieces, action)
-
-
+        print("self"+str(self.pieces)+"\n")
+        print("blocks"+str(self.blocks)+"\n")
+        
 
