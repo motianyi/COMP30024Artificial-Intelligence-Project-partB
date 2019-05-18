@@ -2,6 +2,8 @@
 from queue import PriorityQueue
 from copy import deepcopy
 import random
+import time
+
 import math
 
 EXIT_HEXES = {
@@ -74,7 +76,6 @@ def nextPlayer(playerColor):
     #         return playerList[1]
 
     # return playerList[0]
-
 
 # return list of (succHexes, succNumExits, move)
 def getSuccessors(hexes, numExits, colour):
@@ -251,7 +252,7 @@ class ExamplePlayer:
         self.exitedPieces = {'red':0, 'green':0, 'blue': 0}        
 
         self.exitHexes = EXIT_HEXES[colour]
-        
+        self.tree = Tree(deepcopy(self.hexes))
 
 
         # TODO: Set up state representation.
@@ -281,33 +282,10 @@ class ExamplePlayer:
         #     elif h == curr_h:
         #         bestMove.append(move)
         # return random.choice(bestMove)
+        self.tree.setRoot(deepcopy(self.hexes))
         depth = 3
         return self.maxN(self.hexes.copy(),self.exitedPieces.copy(), depth, self.colour)[1]
 
-
-    # def maxN(self, hexes, numExits, depth, colour):
-    #     # TODO, never goal state,
-    #     if (depth == 0 or isGoalState(numExits, colour)):
-    #         return (heuristic(hexes,numExits),[('PASS', None)])
-
-    #     # inintial value dictionary
-    #     vMax = {'red':-1000, 'green':-1000, 'blue': -1000}
-    #     bestAction = ('PASS', None)
-    #     succ = getSuccessors(hexes.copy(), numExits.copy(), colour)
-    #     if(len(succ) == 0):
-    #         (valuesVector, action) = self.maxN(hexes.copy(), numExits.copy(), depth-1, nextPlayer(colour,hexes))
-    #         return (valuesVector, bestAction)
-    #     for (succHexes, succNumExits, move) in succ:
-    #         (valuesVector, action) = self.maxN(succHexes.copy(), succNumExits.copy(), depth-1, nextPlayer(colour,hexes))
-    #         # print("\n\n")
-    #         # print("action"+str(move))
-    #         if valuesVector[colour] >= vMax[colour]:
-                
-    #             vMax = valuesVector
-    #             bestAction = move
-    #     # print("\n\n")
-    #     # print((vMax, bestAction))
-    #     return (vMax, bestAction)
 
     def maxN(self, hexes, numExits, depth, colour):
         # TODO, never goal state,
@@ -317,7 +295,7 @@ class ExamplePlayer:
         # inintial value dictionary
         vMax = {'red':-100000, 'green':-100000, 'blue': -100000}
         bestActionList = []
-        bestAction = ('PASS', None)
+        # bestAction = ('PASS', None)
         succ = getSuccessors(hexes.copy(), numExits.copy(), colour)
         
         if(len(succ) == 0):
@@ -344,11 +322,6 @@ class ExamplePlayer:
         return (vMax, random.choice(bestActionList))
 
             
-
-    
-    
-
-
 
     def update(self, colour, action):
         """
@@ -417,14 +390,61 @@ class ExamplePlayer:
                 self.hexes[k].remove(piece)
                 break
     
+    def findNextMove(self):
+        #one second
+        t_end = time.time() + 1
+
+
+        rootnode = Node(self.hexes,None)
+
+        while time.time() < t_end:
+            curr = selectNode(rootnode)
+
+            node = curr
+            if len(curr.children.keys()) > 0:
+                action = random.choice(curr.children.keys())
+                node = (curr.children)[action]
+
+            result = simulation(node)
+            backProgation(node, result)
+        
+        bestNode = rootnode.getBestChild()
+        tree.setRoot(bestNode)
+
+        return 
     
+    def selectNode(rootnode):
+        node = rootnode
+        while len(node.children.keys())!=0:
+            node = uctFindNode(node)
+        return node
+
+def uctFindNode(node):
+    if node.isVisit == 0:
+        return Integer.MAX_VALUE
+    return 
+    
+def uctValue(node):
 
 
-   
-   
+
+class Node:
+    def __init__(self,state,parent):
+        self.state = state
+        self.parent = parent
+        self.children = {}
+        self.totalVisit = 0
+        self.isVisit = 0
+        #R,G,B scores
+        self.score = [0,0,0]
+
+# class Tree:
+#     def __init__(self,root):
+#         self.root = root
+
+#     def setRoot(root):
+#         self.root
 
 
-
-
-
+    
 
