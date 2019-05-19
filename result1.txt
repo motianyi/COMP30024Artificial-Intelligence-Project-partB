@@ -1,0 +1,10 @@
+winner: Green
+winner: Green
+winner: Green
+winner: Red
+winner: Green
+winner: Red
+winner: Green
+winner: Green
+winner: Green
+winner: Green

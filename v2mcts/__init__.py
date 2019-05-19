@@ -1,0 +1,1 @@
+from v2mcts.player import ExamplePlayer as Player

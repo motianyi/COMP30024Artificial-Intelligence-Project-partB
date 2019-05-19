@@ -1,0 +1,1 @@
+from v6.player import ExamplePlayer as Player

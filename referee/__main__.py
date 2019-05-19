@@ -10,6 +10,7 @@ from referee.game import Chexers, IllegalActionException
 from referee.player import PlayerWrapper, ResourceLimitException, set_space_line
 from referee.options import get_options
 
+import csv
 def main():
     # Parse command-line options into a namespace for use throughout this
     # program
@@ -32,8 +33,23 @@ def main():
         # library imports should be finished:
         set_space_line()
 
+        # open('simulation.tsv', 'w').close()
+       
+        # with open('simulation.tsv', 'wt') as out_file:
+        #     tsv_writer = csv.writer(out_file, delimiter='\t')
+            
+        #     for i in range(-3,4):
+        #         for j in range(-3,4):
+        #             if i+j <4 and i+j>-4:
+        #                 tsv_writer.writerow([(i,j),0])
+
+
         # Play the game!
-        play([p_R, p_G, p_B], options, out)
+        open('result2.txt', 'w').close()
+        n=10
+        for i in range(0,n):
+            play([p_R, p_G, p_B], options, out)
+        
     
     # In case the game ends in an abnormal way, print a clean error
     # message for the user (rather than a trace).
@@ -97,6 +113,10 @@ def play(players, options, out):
     result = game.end()
     out.section("game over!")
     out.print(result)
+    
+    with open('result2.txt', 'a') as the_file:
+        the_file.writelines(result+"\n")
+    
 
 if __name__ == '__main__':
     main()
